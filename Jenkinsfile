@@ -4,9 +4,6 @@ pipeline {
 		choice(name: 'VERSION', choices: ['1.1.0','1.2.0','1.3.0'], description: '')
 		booleanParam(name: 'executeTests', defaultValue: true, description: '')
 	}
-	environment {
-        PATH = "$PATH:/usr/local/bin"
-    }
 	stages {
 		stage("init") {
 			steps {
@@ -15,14 +12,11 @@ pipeline {
 				}
 			}
 		}
-		stage("Checkout") {
+		stage("build") {
 			steps {
-				checkout scm
-			}
-		}
-		stage("Build") {
-			steps {
-				sh 'docker-compose build web'
+				script {
+					gv.buildApp()
+				}
 			}
 		}
 		stage("test") {
@@ -39,7 +33,9 @@ pipeline {
 		}
 		stage("deploy") {
 			steps {
-				sh "docker-compose up -d"
+				script {
+					gv.deployApp()
+				}
 			}
 		}
 	}
